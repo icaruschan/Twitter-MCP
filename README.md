@@ -45,7 +45,7 @@ This project utilizes a modern, decoupled, and agentic architecture for maximum 
 
 ### Prerequisites
 - [Docker](https://www.docker.com/products/docker-desktop/) installed on your machine.
-- An API Key from a third-party Twitter API provider (e.g., `twitterapi.io`).
+- An API Key from a third-party Twitter API provider ([twitterapi.io](https://twitterapi.io/)).
 - An n8n instance (Cloud or self-hosted).
 - A Supabase project for the PostgreSQL database.
 
