@@ -1,0 +1,25 @@
+version: '3.8'
+
+services:
+  twitter-mcp:
+    build: .
+    container_name: twitter-mcp-server
+    environment:
+      - TWITTER_API_KEY=${TWITTER_API_KEY}
+      - NODE_ENV=production
+    restart: unless-stopped
+    volumes:
+      # Mount for MCP stdio communication if needed
+      - /tmp/mcp:/tmp/mcp
+    networks:
+      - mcp-network
+    healthcheck:
+      test: ["CMD", "node", "-e", "process.exit(0)"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+networks:
+  mcp-network:
+    driver: bridge
