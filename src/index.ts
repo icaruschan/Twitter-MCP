@@ -359,9 +359,9 @@ class TwitterMCPServer {
 
   // NEW: Define the single endpoints for your AI Agents
   private readonly N8N_USER_AGENT_WEBHOOK =
-    "https://n8n-online-a6e3c293ca19.herokuapp.com/webhook/4370aaed-6fa2-4cae-abb0-4ab7c669c803";
+    "YOUR N8N USER MONITOR WEBHOOK";
   private readonly N8N_KEYWORD_AGENT_WEBHOOK =
-    "https://n8n-online-a6e3c293ca19.herokuapp.com/webhook/5f977a8d-6888-42a6-b57c-e687f6eb1210";
+    "YOUR N8N KEYWORD WEBHOOK";
 
   constructor(apiKey: string) {
     this.twitterClient = new TwitterAPIClient(apiKey);
