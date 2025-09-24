@@ -1,0 +1,571 @@
+
+
+Tweet Endpoint
+Get Article
+get article by tweet id. cost 100 credit per article
+
+GET
+/
+twitter
+/
+article
+
+Try it
+Authorizations
+​
+X-API-Key
+stringheaderrequired
+Query Parameters
+​
+tweet_id
+string<string>required
+The tweet id of the article.eg. 1905545699552375179
+
+Response
+
+200
+
+application/json
+Article response
+
+​
+article
+object
+Show child attributes
+
+​
+status
+enum<string>
+Status of the request.success or error
+
+Available options: success, failed 
+​
+message
+string
+Message of the request.error message
+
+
+curl --request GET \
+  --url https://api.twitterapi.io/twitter/article \
+  --header 'X-API-Key: <api-key>'
+
+
+success response
+
+{
+  "article": {
+    "author": {
+      "type": "user",
+      "userName": "<string>",
+      "url": "<string>",
+      "id": "<string>",
+      "name": "<string>",
+      "isBlueVerified": true,
+      "verifiedType": "<string>",
+      "profilePicture": "<string>",
+      "coverPicture": "<string>",
+      "description": "<string>",
+      "location": "<string>",
+      "followers": 123,
+      "following": 123,
+      "canDm": true,
+      "createdAt": "<string>",
+      "favouritesCount": 123,
+      "hasCustomTimelines": true,
+      "isTranslator": true,
+      "mediaCount": 123,
+      "statusesCount": 123,
+      "withheldInCountries": [
+        "<string>"
+      ],
+      "affiliatesHighlightedLabel": {},
+      "possiblySensitive": true,
+      "pinnedTweetIds": [
+        "<string>"
+      ],
+      "isAutomated": true,
+      "automatedBy": "<string>",
+      "unavailable": true,
+      "message": "<string>",
+      "unavailableReason": "<string>",
+      "profile_bio": {
+        "description": "<string>",
+        "entities": {
+          "description": {
+            "urls": [
+              {
+                "display_url": "<string>",
+                "expanded_url": "<string>",
+                "indices": [
+                  123
+                ],
+                "url": "<string>"
+              }
+            ]
+          },
+          "url": {
+            "urls": [
+              {
+                "display_url": "<string>",
+                "expanded_url": "<string>",
+                "indices": [
+                  123
+                ],
+                "url": "<string>"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "replyCount": 123,
+    "likeCount": 123,
+    "quoteCount": 123,
+    "viewCount": 123,
+    "createdAt": "<string>",
+    "title": "<string>",
+    "preview_text": "<string>",
+    "cover_media_img_url": "<string>",
+    "contents": [
+      {
+        "text": "<string>"
+      }
+    ]
+  },
+  "status": "success",
+  "message": "<string>"
+}
+
+
+
+
+
+User Endpoint
+Get User Verified Followers
+Get user verified followers in reverse chronological order (newest first). Returns exactly 20 verified followers per page, sorted by follow date. Most recent followers appear on the first page. Use cursor for pagination through the complete followers list.$0.3 per 1000 followers
+
+GET
+/
+twitter
+/
+user
+/
+verifiedFollowers
+
+Try it
+Authorizations
+​
+X-API-Key
+stringheaderrequired
+Query Parameters
+​
+user_id
+string<string>required
+user_id of the user
+
+​
+cursor
+string<string>
+The cursor to paginate through the results. First page is "".
+
+Response
+
+200
+
+application/json
+User info
+
+​
+followers
+object[]
+Array of followers
+
+Show child attributes
+
+​
+status
+enum<string>
+Status of the request.success or error
+
+Available options: success, error 
+​
+message
+string
+Message of the request.error message
+
+
+curl --request GET \
+  --url https://api.twitterapi.io/twitter/user/verifiedFollowers \
+  --header 'X-API-Key: <api-key>'
+
+
+
+success output
+
+{
+  "followers": [
+    {
+      "type": "user",
+      "userName": "<string>",
+      "url": "<string>",
+      "id": "<string>",
+      "name": "<string>",
+      "isBlueVerified": true,
+      "verifiedType": "<string>",
+      "profilePicture": "<string>",
+      "coverPicture": "<string>",
+      "description": "<string>",
+      "location": "<string>",
+      "followers": 123,
+      "following": 123,
+      "canDm": true,
+      "createdAt": "<string>",
+      "favouritesCount": 123,
+      "hasCustomTimelines": true,
+      "isTranslator": true,
+      "mediaCount": 123,
+      "statusesCount": 123,
+      "withheldInCountries": [
+        "<string>"
+      ],
+      "affiliatesHighlightedLabel": {},
+      "possiblySensitive": true,
+      "pinnedTweetIds": [
+        "<string>"
+      ],
+      "isAutomated": true,
+      "automatedBy": "<string>",
+      "unavailable": true,
+      "message": "<string>",
+      "unavailableReason": "<string>",
+      "profile_bio": {
+        "description": "<string>",
+        "entities": {
+          "description": {
+            "urls": [
+              {
+                "display_url": "<string>",
+                "expanded_url": "<string>",
+                "indices": [
+                  123
+                ],
+                "url": "<string>"
+              }
+            ]
+          },
+          "url": {
+            "urls": [
+              {
+                "display_url": "<string>",
+                "expanded_url": "<string>",
+                "indices": [
+                  123
+                ],
+                "url": "<string>"
+              }
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "status": "success",
+  "message": "<string>"
+}
+
+
+List Endpoint
+Get List Followers
+Get followers of a list. Page size is 20.
+
+GET
+/
+twitter
+/
+list
+/
+followers
+
+Try it
+Authorizations
+​
+X-API-Key
+stringheaderrequired
+Query Parameters
+​
+list_id
+string<string>required
+id of the list
+
+​
+cursor
+string<string>
+cursor of the page
+
+Response
+
+200
+
+application/json
+List followers of the list
+
+​
+followers
+object[]
+Members of the list
+
+Show child attributes
+
+​
+has_next_page
+boolean
+Indicates if there are more results available
+
+​
+next_cursor
+string
+Cursor for fetching the next page of results
+
+​
+status
+enum<string>
+Status of the request: success or error
+
+Available options: success, error 
+​
+msg
+string
+Message of the request, error message if status is error
+
+
+curl --request GET \
+  --url https://api.twitterapi.io/twitter/list/followers \
+  --header 'X-API-Key: <api-key>'
+
+
+success message
+
+{
+  "followers": [
+    {
+      "type": "user",
+      "userName": "<string>",
+      "url": "<string>",
+      "id": "<string>",
+      "name": "<string>",
+      "isBlueVerified": true,
+      "verifiedType": "<string>",
+      "profilePicture": "<string>",
+      "coverPicture": "<string>",
+      "description": "<string>",
+      "location": "<string>",
+      "followers": 123,
+      "following": 123,
+      "canDm": true,
+      "createdAt": "<string>",
+      "favouritesCount": 123,
+      "hasCustomTimelines": true,
+      "isTranslator": true,
+      "mediaCount": 123,
+      "statusesCount": 123,
+      "withheldInCountries": [
+        "<string>"
+      ],
+      "affiliatesHighlightedLabel": {},
+      "possiblySensitive": true,
+      "pinnedTweetIds": [
+        "<string>"
+      ],
+      "isAutomated": true,
+      "automatedBy": "<string>",
+      "unavailable": true,
+      "message": "<string>",
+      "unavailableReason": "<string>",
+      "profile_bio": {
+        "description": "<string>",
+        "entities": {
+          "description": {
+            "urls": [
+              {
+                "display_url": "<string>",
+                "expanded_url": "<string>",
+                "indices": [
+                  123
+                ],
+                "url": "<string>"
+              }
+            ]
+          },
+          "url": {
+            "urls": [
+              {
+                "display_url": "<string>",
+                "expanded_url": "<string>",
+                "indices": [
+                  123
+                ],
+                "url": "<string>"
+              }
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "has_next_page": true,
+  "next_cursor": "<string>",
+  "status": "success",
+  "msg": "<string>"
+}
+
+
+
+
+List Endpoint
+Get List Members
+Get members of a list. Page size is 20.
+
+GET
+/
+twitter
+/
+list
+/
+members
+
+Try it
+Authorizations
+​
+X-API-Key
+stringheaderrequired
+Query Parameters
+​
+list_id
+string<string>required
+id of the list
+
+​
+cursor
+string<string>
+cursor of the page
+
+Response
+
+200
+
+application/json
+List members response
+
+​
+members
+object[]
+Members of the list
+
+Show child attributes
+
+​
+has_next_page
+boolean
+Indicates if there are more results available
+
+​
+next_cursor
+string
+Cursor for fetching the next page of results
+
+​
+status
+enum<string>
+Status of the request: success or error
+
+Available options: success, error 
+​
+msg
+string
+Message of the request, error message if status is error
+
+
+curl --request GET \
+  --url https://api.twitterapi.io/twitter/list/members \
+  --header 'X-API-Key: <api-key>'
+
+
+sucesss message
+
+{
+  "members": [
+    {
+      "type": "user",
+      "userName": "<string>",
+      "url": "<string>",
+      "id": "<string>",
+      "name": "<string>",
+      "isBlueVerified": true,
+      "verifiedType": "<string>",
+      "profilePicture": "<string>",
+      "coverPicture": "<string>",
+      "description": "<string>",
+      "location": "<string>",
+      "followers": 123,
+      "following": 123,
+      "canDm": true,
+      "createdAt": "<string>",
+      "favouritesCount": 123,
+      "hasCustomTimelines": true,
+      "isTranslator": true,
+      "mediaCount": 123,
+      "statusesCount": 123,
+      "withheldInCountries": [
+        "<string>"
+      ],
+      "affiliatesHighlightedLabel": {},
+      "possiblySensitive": true,
+      "pinnedTweetIds": [
+        "<string>"
+      ],
+      "isAutomated": true,
+      "automatedBy": "<string>",
+      "unavailable": true,
+      "message": "<string>",
+      "unavailableReason": "<string>",
+      "profile_bio": {
+        "description": "<string>",
+        "entities": {
+          "description": {
+            "urls": [
+              {
+                "display_url": "<string>",
+                "expanded_url": "<string>",
+                "indices": [
+                  123
+                ],
+                "url": "<string>"
+              }
+            ]
+          },
+          "url": {
+            "urls": [
+              {
+                "display_url": "<string>",
+                "expanded_url": "<string>",
+                "indices": [
+                  123
+                ],
+                "url": "<string>"
+              }
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "has_next_page": true,
+  "next_cursor": "<string>",
+  "status": "success",
+  "msg": "<string>"
+}
+
+
+
+
+

@@ -112,6 +112,7 @@ class TwitterAPIClient {
     );
   }
 
+  // --- Existing Methods ---
   async getUserInfo(userName: string): Promise<TwitterUser | null> {
     try {
       const response = await this.api.get("/twitter/user/info", {
@@ -123,7 +124,6 @@ class TwitterAPIClient {
       return null;
     }
   }
-
   async getUserTweets(
     userName: string,
     cursor?: string,
@@ -148,7 +148,6 @@ class TwitterAPIClient {
       return { tweets: [], has_next_page: false, next_cursor: undefined };
     }
   }
-
   async getUserFollowers(
     userName: string,
     cursor?: string,
@@ -172,7 +171,6 @@ class TwitterAPIClient {
       return { followers: [], has_next_page: false, next_cursor: undefined };
     }
   }
-
   async getUserFollowings(
     userName: string,
     cursor?: string,
@@ -196,7 +194,6 @@ class TwitterAPIClient {
       return { followings: [], has_next_page: false, next_cursor: undefined };
     }
   }
-
   async getBatchUserInfo(userIds: string[]): Promise<TwitterUser[]> {
     const response = await this.api.get("/twitter/user/batch_info_by_ids", {
       params: { userIds: userIds.join(",") },
@@ -347,6 +344,79 @@ class TwitterAPIClient {
     });
     return safeArray(response.data.trends);
   }
+
+  // --- NEW: Methods for Verified Followers and Lists ---
+  async getVerifiedFollowers(
+    userId: string,
+    cursor?: string
+  ): Promise<{
+    followers: TwitterUser[];
+    has_next_page: boolean;
+    next_cursor?: string;
+  }> {
+    try {
+      const response = await this.api.get("/twitter/user/verifiedFollowers", {
+        params: { user_id: userId, cursor },
+      });
+      return {
+        followers: safeArray<TwitterUser>(response.data?.followers),
+        has_next_page: response.data?.has_next_page || false,
+        next_cursor: response.data?.next_cursor,
+      };
+    } catch (error) {
+      console.error(
+        `getVerifiedFollowers failed for user ID ${userId}:`,
+        error
+      );
+      return { followers: [], has_next_page: false, next_cursor: undefined };
+    }
+  }
+
+  async getListMembers(
+    listId: string,
+    cursor?: string
+  ): Promise<{
+    members: TwitterUser[];
+    has_next_page: boolean;
+    next_cursor?: string;
+  }> {
+    try {
+      const response = await this.api.get("/twitter/list/members", {
+        params: { list_id: listId, cursor },
+      });
+      return {
+        members: safeArray<TwitterUser>(response.data?.members),
+        has_next_page: response.data?.has_next_page || false,
+        next_cursor: response.data?.next_cursor,
+      };
+    } catch (error) {
+      console.error(`getListMembers failed for list ID ${listId}:`, error);
+      return { members: [], has_next_page: false, next_cursor: undefined };
+    }
+  }
+
+  async getListFollowers(
+    listId: string,
+    cursor?: string
+  ): Promise<{
+    followers: TwitterUser[];
+    has_next_page: boolean;
+    next_cursor?: string;
+  }> {
+    try {
+      const response = await this.api.get("/twitter/list/followers", {
+        params: { list_id: listId, cursor },
+      });
+      return {
+        followers: safeArray<TwitterUser>(response.data?.followers),
+        has_next_page: response.data?.has_next_page || false,
+        next_cursor: response.data?.next_cursor,
+      };
+    } catch (error) {
+      console.error(`getListFollowers failed for list ID ${listId}:`, error);
+      return { followers: [], has_next_page: false, next_cursor: undefined };
+    }
+  }
 }
 
 // =================================================================
@@ -356,12 +426,8 @@ class TwitterAPIClient {
 class TwitterMCPServer {
   private server: Server;
   private twitterClient: TwitterAPIClient;
-
-  // NEW: Define the single endpoints for your AI Agents
-  private readonly N8N_USER_AGENT_WEBHOOK =
-    "https://n8n-online-a6e3c293ca19.herokuapp.com/webhook/4370aaed-6fa2-4cae-abb0-4ab7c669c803";
-  private readonly N8N_KEYWORD_AGENT_WEBHOOK =
-    "https://n8n-online-a6e3c293ca19.herokuapp.com/webhook/5f977a8d-6888-42a6-b57c-e687f6eb1210";
+  private readonly N8N_UNIFIED_AGENT_WEBHOOK =
+    "https://n8n-online-a6e3c293ca19.herokuapp.com/webhook/35a0d835-734b-4e4c-a842-12f7462a6411";
 
   constructor(apiKey: string) {
     this.twitterClient = new TwitterAPIClient(apiKey);
@@ -384,83 +450,49 @@ class TwitterMCPServer {
     });
   }
 
+  // UPDATED: Added new tools for lists and verified followers
   private getToolDefinitions(): Tool[] {
     return [
-      // --- n8n User Monitoring Control Panel ---
+      // --- n8n Unified Monitoring Control Panel ---
       {
-        name: "start_monitoring_user",
+        name: "add_monitor",
         description:
-          "Adds a Twitter user to the n8n workflow for continuous real-time monitoring.",
+          "Adds a new user account or keyword/query to the n8n monitoring engine.",
         inputSchema: {
           type: "object",
           properties: {
-            userName: {
+            target: {
               type: "string",
               description:
-                "The Twitter username (without @) to start monitoring.",
+                'The user account (e.g., "@nasa") or keyword/query (e.g., "#AI") to start monitoring.',
             },
           },
-          required: ["userName"],
+          required: ["target"],
         },
       },
       {
-        name: "stop_monitoring_user",
-        description: "Removes a Twitter user from the n8n monitoring workflow.",
+        name: "remove_monitor",
+        description:
+          "Removes a user account or keyword/query from the n8n monitoring engine.",
         inputSchema: {
           type: "object",
           properties: {
-            userName: {
+            target: {
               type: "string",
               description:
-                "The Twitter username (without @) to stop monitoring.",
+                "The user account or keyword/query to stop monitoring.",
             },
           },
-          required: ["userName"],
+          required: ["target"],
         },
       },
       {
-        name: "list_monitored_users",
+        name: "list_monitors",
         description:
-          "Retrieves and lists all Twitter users currently being monitored by the n8n workflow.",
+          "Lists all currently monitored user accounts and keywords from the n8n engine.",
         inputSchema: { type: "object", properties: {} },
       },
-      // --- n8n Keyword Monitoring Control Panel ---
-      {
-        name: "start_monitoring_keyword",
-        description:
-          "Adds a keyword or search query to the n8n workflow for continuous real-time monitoring.",
-        inputSchema: {
-          type: "object",
-          properties: {
-            keyword: {
-              type: "string",
-              description:
-                "The keyword or advanced search query to start monitoring.",
-            },
-          },
-          required: ["keyword"],
-        },
-      },
-      {
-        name: "stop_monitoring_keyword",
-        description: "Removes a keyword from the n8n monitoring workflow.",
-        inputSchema: {
-          type: "object",
-          properties: {
-            keyword: {
-              type: "string",
-              description: "The keyword or query to stop monitoring.",
-            },
-          },
-          required: ["keyword"],
-        },
-      },
-      {
-        name: "list_monitored_keywords",
-        description:
-          "Retrieves and lists all keywords currently being monitored by the n8n workflow.",
-        inputSchema: { type: "object", properties: {} },
-      },
+
       // --- Analysis Tools ---
       {
         name: "analyze_account",
@@ -621,9 +653,71 @@ class TwitterMCPServer {
           oneOf: [{ required: ["userIds"] }, { required: ["userNames"] }],
         },
       },
+      {
+        name: "get_article",
+        description: "Retrieves the content of a long-form tweet (article).",
+        inputSchema: {
+          type: "object",
+          properties: {
+            tweetId: {
+              type: "string",
+              description: "The tweet ID of the article.",
+            },
+          },
+          required: ["tweetId"],
+        },
+      },
+
+      // --- NEW: Tools for Lists and Verified Followers ---
+      {
+        name: "get_verified_followers",
+        description: "Get a user's verified (blue check) followers.",
+        inputSchema: {
+          type: "object",
+          properties: {
+            userId: {
+              type: "string",
+              description: "The numerical ID of the user.",
+            },
+            cursor: { type: "string", description: "Cursor for pagination." },
+          },
+          required: ["userId"],
+        },
+      },
+      {
+        name: "get_list_members",
+        description: "Get the members of a specific Twitter List.",
+        inputSchema: {
+          type: "object",
+          properties: {
+            listId: {
+              type: "string",
+              description: "The numerical ID of the Twitter List.",
+            },
+            cursor: { type: "string", description: "Cursor for pagination." },
+          },
+          required: ["listId"],
+        },
+      },
+      {
+        name: "get_list_followers",
+        description: "Get the followers of a specific Twitter List.",
+        inputSchema: {
+          type: "object",
+          properties: {
+            listId: {
+              type: "string",
+              description: "The numerical ID of the Twitter List.",
+            },
+            cursor: { type: "string", description: "Cursor for pagination." },
+          },
+          required: ["listId"],
+        },
+      },
     ];
   }
 
+  // UPDATED: handleToolCall now includes the new cases
   private async handleToolCall(toolName: string, args: any): Promise<any> {
     console.error(
       `Executing tool: ${toolName} with args:`,
@@ -631,21 +725,13 @@ class TwitterMCPServer {
     );
     try {
       switch (toolName) {
-        // --- User Monitoring Cases ---
-        case "start_monitoring_user":
-          return await this.handleStartMonitoringUser(args);
-        case "stop_monitoring_user":
-          return await this.handleStopMonitoringUser(args);
-        case "list_monitored_users":
-          return await this.handleListMonitoredUsers(args);
-        // --- Keyword Monitoring Cases ---
-        case "start_monitoring_keyword":
-          return await this.handleStartMonitoringKeyword(args);
-        case "stop_monitoring_keyword":
-          return await this.handleStopMonitoringKeyword(args);
-        case "list_monitored_keywords":
-          return await this.handleListMonitoredKeywords(args);
-        // --- Analysis Cases ---
+        // ... existing cases ...
+        case "add_monitor":
+          return await this.handleAddMonitor(args);
+        case "remove_monitor":
+          return await this.handleRemoveMonitor(args);
+        case "list_monitors":
+          return await this.handleListMonitors(args);
         case "analyze_account":
           return await this.handleAnalyzeAccount(args);
         case "search_tweets":
@@ -660,6 +746,17 @@ class TwitterMCPServer {
           return await this.handleGetTrends(args);
         case "batch_analyze":
           return await this.handleBatchAnalyze(args);
+        case "get_article":
+          return await this.handleGetArticle(args);
+
+        // --- NEW: Cases for the new tools ---
+        case "get_verified_followers":
+          return await this.handleGetVerifiedFollowers(args);
+        case "get_list_members":
+          return await this.handleGetListMembers(args);
+        case "get_list_followers":
+          return await this.handleGetListFollowers(args);
+
         default:
           throw new Error(`Unknown tool: ${toolName}`);
       }
@@ -684,54 +781,30 @@ class TwitterMCPServer {
     }
   }
 
-  // --- REWRITTEN: Handlers for the n8n AI Agents ---
-  private async handleStartMonitoringUser(args: any) {
-    const { userName } = args;
-    const message = `Please add the user @${userName} to the monitoring list.`;
-    const response = await axios.post(this.N8N_USER_AGENT_WEBHOOK, { message });
-    return { content: [{ type: "text", text: JSON.stringify(response.data) }] };
-  }
-
-  private async handleStopMonitoringUser(args: any) {
-    const { userName } = args;
-    const message = `Please remove the user @${userName} from the monitoring list.`;
-    const response = await axios.post(this.N8N_USER_AGENT_WEBHOOK, { message });
-    return { content: [{ type: "text", text: JSON.stringify(response.data) }] };
-  }
-
-  private async handleListMonitoredUsers(args: any) {
-    const message = "What users are currently being monitored?";
-    const response = await axios.post(this.N8N_USER_AGENT_WEBHOOK, { message });
-    return { content: [{ type: "text", text: JSON.stringify(response.data) }] };
-  }
-
-  private async handleStartMonitoringKeyword(args: any) {
-    const { keyword } = args;
-    const message = `Please add the keyword "${keyword}" to the monitoring list.`;
-    const response = await axios.post(this.N8N_KEYWORD_AGENT_WEBHOOK, {
+  // ... existing handlers ...
+  private async handleAddMonitor(args: any) {
+    const { target } = args;
+    const message = `Please add the following target to the monitoring list: ${target}`;
+    const response = await axios.post(this.N8N_UNIFIED_AGENT_WEBHOOK, {
       message,
     });
     return { content: [{ type: "text", text: JSON.stringify(response.data) }] };
   }
-
-  private async handleStopMonitoringKeyword(args: any) {
-    const { keyword } = args;
-    const message = `Please remove the keyword "${keyword}" from the monitoring list.`;
-    const response = await axios.post(this.N8N_KEYWORD_AGENT_WEBHOOK, {
+  private async handleRemoveMonitor(args: any) {
+    const { target } = args;
+    const message = `Please remove the following target from the monitoring list: ${target}`;
+    const response = await axios.post(this.N8N_UNIFIED_AGENT_WEBHOOK, {
       message,
     });
     return { content: [{ type: "text", text: JSON.stringify(response.data) }] };
   }
-
-  private async handleListMonitoredKeywords(args: any) {
-    const message = "What keywords are currently being monitored?";
-    const response = await axios.post(this.N8N_KEYWORD_AGENT_WEBHOOK, {
+  private async handleListMonitors(args: any) {
+    const message = "Please list all currently monitored users and keywords.";
+    const response = await axios.post(this.N8N_UNIFIED_AGENT_WEBHOOK, {
       message,
     });
     return { content: [{ type: "text", text: JSON.stringify(response.data) }] };
   }
-
-  // --- Existing, Corrected Handler Methods ---
   private async handleAnalyzeAccount(args: any) {
     const {
       userName,
@@ -1091,6 +1164,41 @@ class TwitterMCPServer {
     };
     return {
       content: [{ type: "text", text: JSON.stringify(analysis, null, 2) }],
+    };
+  }
+  private async handleGetArticle(args: any) {
+    const { tweetId } = args;
+    const article = await this.twitterClient.getArticle(tweetId);
+    return {
+      content: [{ type: "text", text: JSON.stringify(article, null, 2) }],
+    };
+  }
+
+  // --- NEW: Handlers for the new tools ---
+  private async handleGetVerifiedFollowers(args: any) {
+    const { userId, cursor } = args;
+    const result = await this.twitterClient.getVerifiedFollowers(
+      userId,
+      cursor
+    );
+    return {
+      content: [{ type: "text", text: JSON.stringify(result, null, 2) }],
+    };
+  }
+
+  private async handleGetListMembers(args: any) {
+    const { listId, cursor } = args;
+    const result = await this.twitterClient.getListMembers(listId, cursor);
+    return {
+      content: [{ type: "text", text: JSON.stringify(result, null, 2) }],
+    };
+  }
+
+  private async handleGetListFollowers(args: any) {
+    const { listId, cursor } = args;
+    const result = await this.twitterClient.getListFollowers(listId, cursor);
+    return {
+      content: [{ type: "text", text: JSON.stringify(result, null, 2) }],
     };
   }
 
