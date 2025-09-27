@@ -1,0 +1,94 @@
+{
+  "name": "List Users",
+  "nodes": [
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "monitored_accounts",
+        "returnAll": true,
+        "filterType": "none"
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        208,
+        0
+      ],
+      "id": "9b0f3ed0-b94f-4202-b3e7-33142489fda0",
+      "name": "Get many rows",
+      "credentials": {
+        "supabaseApi": {
+          "id": "c08jQ9J9IhBybDpp",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const users = $input.all().map(item => item.json.username);\nreturn { users: users };"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        416,
+        0
+      ],
+      "id": "9adc5b3a-54c5-49bc-9c51-d1cad2fd5fbe",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "c6724bf5-4b17-45c2-b5c4-2d2c40640936",
+      "name": "When Executed by Another Workflow"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Get many rows": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        []
+      ]
+    },
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Get many rows",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "320a626e-6cad-4320-b7b9-d8b1f78bce7a",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "3930c4e1ed859e6ca254009233a4e11aa3f2ba20182e144ef79114fc7d845919"
+  },
+  "id": "YunD6yQza8XFQXC7",
+  "tags": []
+}

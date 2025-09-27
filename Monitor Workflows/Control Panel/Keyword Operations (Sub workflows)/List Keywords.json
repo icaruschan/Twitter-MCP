@@ -1,0 +1,94 @@
+{
+  "name": "List Keywords",
+  "nodes": [
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "monitored_keywords",
+        "returnAll": true,
+        "filterType": "none"
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        208,
+        0
+      ],
+      "id": "f6f8fd4f-22f8-4f47-a72e-69502e760a72",
+      "name": "Get many rows",
+      "credentials": {
+        "supabaseApi": {
+          "id": "c08jQ9J9IhBybDpp",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const keywords = $input.all().map(item => item.json.keyword);\nreturn { keywords };"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        416,
+        0
+      ],
+      "id": "01cdc9d8-50e7-4a14-ab47-fca05c90372b",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        32,
+        0
+      ],
+      "id": "8dbf96e7-be81-468b-a6e2-9dcf83921cd1",
+      "name": "When Executed by Another Workflow"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Get many rows": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        []
+      ]
+    },
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Get many rows",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "cf4eabd4-d344-4d2f-88d5-221e5d0d89a8",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "3930c4e1ed859e6ca254009233a4e11aa3f2ba20182e144ef79114fc7d845919"
+  },
+  "id": "bYNJUaJEJO73opka",
+  "tags": []
+}

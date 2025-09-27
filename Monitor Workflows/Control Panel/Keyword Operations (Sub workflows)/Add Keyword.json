@@ -1,0 +1,81 @@
+{
+  "name": "Add Keyword",
+  "nodes": [
+    {
+      "parameters": {
+        "tableId": "monitored_keywords",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "keyword",
+              "fieldValue": "={{ $json.keyword }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -384,
+        -272
+      ],
+      "id": "e25094ad-14dd-46e4-892d-0b45ea9d5867",
+      "name": "Create a row",
+      "credentials": {
+        "supabaseApi": {
+          "id": "c08jQ9J9IhBybDpp",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "keyword"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -592,
+        -272
+      ],
+      "id": "acb5d003-42a8-45ef-8463-2dd0feeac5bc",
+      "name": "When Executed by Another Workflow"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Create a row": {
+      "main": [
+        []
+      ]
+    },
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Create a row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "d3a1e712-8fd9-4529-bae6-c27fff4469ed",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "3930c4e1ed859e6ca254009233a4e11aa3f2ba20182e144ef79114fc7d845919"
+  },
+  "id": "21lxI7RAjO6NXebN",
+  "tags": []
+}

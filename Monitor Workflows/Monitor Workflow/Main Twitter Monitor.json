@@ -1,0 +1,285 @@
+{
+  "name": "Main Twitter Monitor",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 2
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -1056,
+        -400
+      ],
+      "id": "74a2a285-d35b-4d18-a344-87bc844470a1",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "url": "https://api.twitterapi.io/twitter/tweet/advanced_search",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "queryType",
+              "value": "Latest"
+            },
+            {
+              "name": "query",
+              "value": "=from:{{ $json.username }} since:{{ new Date().toISOString().split('T')[0] }} -filter:replies"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -720,
+        -400
+      ],
+      "id": "e374edd7-fc87-481c-a64c-ea22a14502c1",
+      "name": "Advanced Search",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "yIcqjSuOkASaYmAJ",
+          "name": "Twitter API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "tableId": "monitored_accounts",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "username",
+              "condition": "eq",
+              "keyValue": "={{ $('Get many rows').item.json.username }}"
+            }
+          ]
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "last_tweet_id",
+              "fieldValue": "={{ $('Filter').item.json.newTweetsForNotification[0].id }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -96,
+        -224
+      ],
+      "id": "6856760b-eefa-480a-adec-0bf05628534b",
+      "name": "Update a row",
+      "credentials": {
+        "supabaseApi": {
+          "id": "c08jQ9J9IhBybDpp",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "monitored_accounts",
+        "returnAll": true,
+        "filterType": "none"
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -880,
+        -400
+      ],
+      "id": "de115782-7ebd-4884-b06b-9862c5d900ec",
+      "name": "Get many rows",
+      "credentials": {
+        "supabaseApi": {
+          "id": "c08jQ9J9IhBybDpp",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "// Get all the tweets found for the current user\nconst foundTweets = $input.item.json.tweets;\n\n// Get the last tweet ID we stored from the start of the workflow\nconst lastSeenId = $('Get many rows').item.json.last_tweet_id;\n\nlet trulyNewTweets = [];\n\n// If we have never stored an ID for this user, then all tweets are new\nif (!lastSeenId) {\n  trulyNewTweets = foundTweets;\n} else {\n  // Otherwise, filter the list to only include tweets with an ID\n  // that is numerically greater than the one we have stored.\n  trulyNewTweets = foundTweets.filter(tweet => BigInt(tweet.id) > BigInt(lastSeenId));\n}\n\n// Return an object that contains our clean list of truly new tweets\nreturn {\n  newTweetsForNotification: trulyNewTweets\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -560,
+        -400
+      ],
+      "id": "49aeaba1-2297-4568-8928-89f8935cfa1c",
+      "name": "Filter"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "0bb52278-060f-4746-a612-e3c82c04f79c",
+              "leftValue": "={{ $('Filter').item.json.newTweetsForNotification.length }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -368,
+        -400
+      ],
+      "id": "192bbe57-4750-47e1-b3bb-40e65ce14e44",
+      "name": "If"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        -352,
+        -144
+      ],
+      "id": "de66a335-3252-4509-8310-38f5ad66eeba",
+      "name": "No Operation, do nothing"
+    },
+    {
+      "parameters": {
+        "authentication": "webhook",
+        "content": "={{  \"@everyone\\n\\n\" + $('Filter').item.json.newTweetsForNotification.map(tweet => `🚀 **New Tweet from @${tweet.author.userName}!**\\n\\n> ${tweet.text.replace(/\\n/g, '\\n> ')}\\n\\n❤️ ${tweet.likeCount}   🔁 ${tweet.retweetCount}   👁️ ${tweet.viewCount || 0}\\n[View Tweet](${tweet.url})`).join('\\n\\n---\\n\\n') }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.discord",
+      "typeVersion": 2,
+      "position": [
+        -112,
+        -416
+      ],
+      "id": "8f3fa3ce-56d4-4d4b-b5b2-bf2bf2870e9b",
+      "name": "Discord",
+      "webhookId": "33ba53f1-95fe-4cf5-9e58-39533f223d53",
+      "credentials": {
+        "discordWebhookApi": {
+          "id": "Kx8gcTq8g1Wxu7Gr",
+          "name": "Tweet Monitor"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get many rows",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Advanced Search": {
+      "main": [
+        [
+          {
+            "node": "Filter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update a row": {
+      "main": [
+        []
+      ]
+    },
+    "Get many rows": {
+      "main": [
+        [
+          {
+            "node": "Advanced Search",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Update a row",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Discord",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "No Operation, do nothing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "baf181b0-986f-413c-8bce-1f089f3370cc",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "3930c4e1ed859e6ca254009233a4e11aa3f2ba20182e144ef79114fc7d845919"
+  },
+  "id": "0R3nV5kDQzhiYa9V",
+  "tags": []
+}

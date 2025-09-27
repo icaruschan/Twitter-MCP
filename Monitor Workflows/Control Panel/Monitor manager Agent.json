@@ -1,0 +1,333 @@
+{
+  "name": "Control Panel: Monitor manager",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [-448, -192],
+      "id": "b5793ed7-f31c-4b84-a040-97a831fef90f",
+      "name": "Webhook",
+      "webhookId": "add yours"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [-592, -16],
+      "id": "299be39f-e6fa-4c2d-946d-7adcae1af74c",
+      "name": "OpenRouter Chat Model",
+      "credentials": {
+        "openRouterApi": {
+          "id": "cTqgKDf9WHwcBbkT",
+          "name": "OpenRouter account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "yp8bH1d5xXIq3fEP",
+          "mode": "list",
+          "cachedResultName": "Add User"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "userName": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('userName', ``, 'string') }}"
+          },
+          "matchingColumns": ["userName"],
+          "schema": [
+            {
+              "id": "userName",
+              "displayName": "userName",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [-432, 0],
+      "id": "19d9ed65-8c12-4760-93ed-a4d255b120e3",
+      "name": "Add User"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "YunD6yQza8XFQXC7",
+          "mode": "list",
+          "cachedResultName": "List Users"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {}
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [-304, 0],
+      "id": "752e8621-6c39-49a7-acfc-e73f23d4f9af",
+      "name": "List Users"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "hluHAQ3IOIQMizN9",
+          "mode": "list",
+          "cachedResultName": "Delete User"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "userName": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('userName', ``, 'string') }}"
+          },
+          "matchingColumns": ["userName"],
+          "schema": [
+            {
+              "id": "userName",
+              "displayName": "userName",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [-176, 0],
+      "id": "08493461-9f4f-48e4-8c05-f8e94cc70f43",
+      "name": "Delete User"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "21lxI7RAjO6NXebN",
+          "mode": "list",
+          "cachedResultName": "Add Keyword"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "keyword": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('keyword', ``, 'string') }}"
+          },
+          "matchingColumns": ["keyword"],
+          "schema": [
+            {
+              "id": "keyword",
+              "displayName": "keyword",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [-48, 0],
+      "id": "1052e833-a3d7-4a87-b7ae-1986477a6fdf",
+      "name": "Add Keyword"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "KrmXVf4gwemrmvdG",
+          "mode": "list",
+          "cachedResultName": "Delete Keyword"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "keyword": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('keyword', ``, 'string') }}"
+          },
+          "matchingColumns": ["keyword"],
+          "schema": [
+            {
+              "id": "keyword",
+              "displayName": "keyword",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [80, 0],
+      "id": "8034f944-9185-404b-ab61-5a65c93ac56f",
+      "name": "Delete Keyword"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "bYNJUaJEJO73opka",
+          "mode": "list",
+          "cachedResultName": "List Keywords"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {}
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [224, 0],
+      "id": "ef20c617-5198-4ee4-8383-981b210c3c50",
+      "name": "List Keywords"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.body.message }}",
+        "options": {
+          "systemMessage": "=# System Prompt\n\nYou are a specialized AI assistant that manages a Twitter monitoring system.  \nYour primary goal is to understand a user's natural language command and call the correct tool to manage either **user accounts** or **keywords/queries**.  \n\n---\n\n## CORE INSTRUCTIONS\n\n1. **Analyze the Target Type**  \n   First, analyze the user's message to identify the target of their command:  \n   - If the target starts with an `@` symbol (e.g., `@nasa`), it is a **user account**.  \n   - If the target is a hashtag (`#`), a phrase in quotes (`\"`), or any other text, it is a **keyword/query**.\n\n2. **Determine the Intent**  \n   Determine if the user wants to **ADD** (\"start monitoring,\" \"track,\" \"add\"),  \n   **REMOVE** (\"stop monitoring,\" \"delete,\" \"remove\"), or **LIST** (\"what am I monitoring,\" \"show me the list\") the specified target.\n\n3. **Select ONE Tool**  \n   Based on the target type (user or keyword) and the intent (add, remove, or list), you must select exactly **one** of the six available tools.  \n\n   **Examples:**  \n   - *Example 1:* \"stop tracking `@nasa`\" → target is a **user**, intent is **remove** → call `delete_user`.  \n   - *Example 2:* \"add the hashtag `#AI`\" → target is a **keyword**, intent is **add** → call `add_keyword`.  \n   - *Example 3:* \"list all users\" → call `list_users`.  \n\n---\n\n## TOOL MANIFEST\n\nYou have access to the following six tools, divided into two categories.\n\n---\n\n### User Account Management Tools\n\n1. **Tool Name: `Add User`**  \n   - **Description:** Use this tool ONLY when the user wants to add a new **user account** to the monitoring list.  \n   - **Parameters:** `userName` *(string, required)*: The username to add (without the @ symbol).  \n\n2. **Tool Name: `Delete User`**  \n   - **Description:** Use this tool ONLY when the user wants to remove a **user account** from the monitoring list.  \n   - **Parameters:** `userName` *(string, required)*: The username to remove.  \n\n3. **Tool Name: `List Users`**  \n   - **Description:** Use this tool ONLY when the user asks to see the current list of monitored **user accounts**.  \n   - **Parameters:** None  \n\n---\n\n### Keyword & Query Management Tools\n\n1. **Tool Name: `Add Keyword`**  \n   - **Description:** Use this tool ONLY when the user wants to add a new **keyword or search query** to the monitoring list.  \n   - **Parameters:** `keyword` *(string, required)*: The keyword or query to add.  \n\n2. **Tool Name: `Delete Keyword`**  \n   - **Description:** Use this tool ONLY when the user wants to remove a **keyword or query** from the monitoring list.  \n   - **Parameters:** `keyword` *(string, required)*: The keyword or query to remove.  \n\n3. **Tool Name: `List Keywords`**  \n   - **Description:** Use this tool ONLY when the user asks to see the current list of monitored **keywords and queries**.  \n   - **Parameters:** None  \n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [-240, -192],
+      "id": "b29bf086-bb00-4b06-979c-aab6c96362bd",
+      "name": "Monitor manager"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Monitor manager",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Monitor manager",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add User": {
+      "ai_tool": [
+        [
+          {
+            "node": "Monitor manager",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "List Users": {
+      "ai_tool": [
+        [
+          {
+            "node": "Monitor manager",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Delete User": {
+      "ai_tool": [
+        [
+          {
+            "node": "Monitor manager",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add Keyword": {
+      "ai_tool": [
+        [
+          {
+            "node": "Monitor manager",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Delete Keyword": {
+      "ai_tool": [
+        [
+          {
+            "node": "Monitor manager",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "List Keywords": {
+      "ai_tool": [
+        [
+          {
+            "node": "Monitor manager",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "4cbda40b-b857-4cb4-8894-43daaeeb3337",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "3930c4e1ed859e6ca254009233a4e11aa3f2ba20182e144ef79114fc7d845919"
+  },
+  "id": "QNTb1I7oY5LQv4Wg",
+  "tags": []
+}
