@@ -18,11 +18,11 @@ The server is built with Node.js/TypeScript, packaged in a Docker container, and
 
 This project utilizes a modern, decoupled, and agentic architecture for maximum robustness and scalability.
 
-- **Twitter MCP Server (This Repo):** The stateless, Dockerized front-end that exposes a rich toolset to the AI assistant.
-- **n8n Automation Engine:** A stateful, persistent backend that contains two main parts:
-  1.  **The AI Agent Router:** A single workflow that receives commands from the MCP, uses an LLM to understand intent, and calls the appropriate sub-workflow to manage the monitoring lists.
-  2.  **The Monitoring Engines:** Two separate, scheduled workflows that poll the Twitter API for new tweets from the monitored users and keywords, preventing duplicate notifications.
-- **Supabase (PostgreSQL) Database:** The "single source of truth" that stores the monitoring lists and the last seen tweet ID for state management.
+-   **Twitter MCP Server (This Repo):** The stateless, Dockerized front-end that exposes a rich toolset to the AI assistant.
+-   **n8n Automation Engine:** A stateful, persistent backend that contains two main parts:
+    1.  **The AI Agent Router:** A single workflow that receives commands from the MCP, uses an LLM to understand intent, and calls the appropriate sub-workflow to manage the monitoring lists.
+    2.  **The Monitoring Engines:** Two separate, scheduled workflows that poll the Twitter API for new tweets from the monitored users and keywords, preventing duplicate notifications.
+-   **Supabase (PostgreSQL) Database:** The "single source of truth" that stores the monitoring lists and the last seen tweet ID for state management.
 
 ---
 
@@ -31,7 +31,6 @@ This project utilizes a modern, decoupled, and agentic architecture for maximum 
 The MCP exposes a total of **14 high-level tools**. These are divided into two categories: a control panel for managing the n8n monitoring engine and a suite of on-demand analysis tools.
 
 ### 🤖 Unified Monitoring Control Panel (3 Tools)
-
 These tools act as a natural language remote control for the n8n monitoring engine.
 
 <details>
@@ -59,7 +58,6 @@ Lists all currently monitored user accounts and keywords from the n8n engine.
 </details>
 
 ### 🔬 On-Demand Analysis & Intelligence Tools (11 Tools)
-
 These tools perform real-time data fetching and processing for immediate insights.
 
 <details>
@@ -93,7 +91,7 @@ Provides a detailed breakdown of the engagement for a single, specific tweet.
 </details>
 
 <details>
-<summary><strong>7. `get_verified_followers` (New!)</strong></summary>
+<summary><strong>7. `get_verified_followers`</strong></summary>
 <br>
 Gets a list of a user's followers who are verified (have a blue check).
 <br><br>
@@ -103,7 +101,7 @@ Gets a list of a user's followers who are verified (have a blue check).
 </details>
 
 <details>
-<summary><strong>8. `get_list_members` (New!)</strong></summary>
+<summary><strong>8. `get_list_members`</strong></summary>
 <br>
 Gets the members of a specific Twitter List.
 <br><br>
@@ -113,7 +111,7 @@ Gets the members of a specific Twitter List.
 </details>
 
 <details>
-<summary><strong>9. `get_list_followers` (New!)</strong></summary>
+<summary><strong>9. `get_list_followers`</strong></summary>
 <br>
 Gets the followers of a specific Twitter List.
 <br><br>
@@ -177,7 +175,6 @@ Retrieves the content of a long-form tweet (article).
 ## 🛠️ Getting Started
 
 ### Prerequisites
-
 - [Docker](https://www.docker.com/products/docker-desktop/) installed on your machine.
 - An API Key from a third-party Twitter API provider ([twitterapi.io](https://twitterapi.io/)).
 - An n8n instance with a configured LLM (e.g., via OpenRouter).
@@ -186,33 +183,49 @@ Retrieves the content of a long-form tweet (article).
 ### Installation & Local Setup
 
 1.  **Clone the Repository**
-
     ```bash
     git clone https://github.com/icaruschan/Twitter-MCP.git
     cd Twitter-MCP
     ```
 
 2.  **Configure Environment Variables**
-
     - Create a `.env` file in the root of the project.
     - Add your Twitter API key:
-
     ```env
     TWITTER_API_KEY=your_secret_api_key_here
     ```
 
 3.  **Set Up n8n & Supabase**
-
-    - The n8n workflow templates for this project are available in a separate repository: **[twitter-mcp-n8n-workflows](https://github.com/icaruschan/twitter-mcp-n8n-workflows)** (This is your new repo link).
-    - Import the workflows into your n8n instance and configure your Supabase tables.
-    - In `src/index.ts`, paste the single, unique webhook URL for your new **Unified AI Agent** into the `N8N_UNIFIED_AGENT_WEBHOOK` constant.
+    - The complete n8n backend, including all monitoring and agent workflows, is available as a set of importable JSON templates in a separate repository.
+    - **[Click here to get the n8n workflow templates](https://github.com/icaruschan/twitter-mcp-n8n-workflows)**
+    - Follow the instructions in that repository to set up your Supabase tables and import the workflows into your n8n instance.
+    - Once your "Unified AI Agent" workflow is active in n8n, copy its unique **Production Webhook URL**.
+    - In this project's `src/index.ts` file, paste that URL into the `N8N_UNIFIED_AGENT_WEBHOOK` constant.
 
 4.  **Build and Run the Docker Container**
-
     ```bash
     # Build the container image
     docker-compose build
 
     # Run the container in the background
     docker-compose up -d
+    ```
+
+### 🔌 Connecting to an AI Assistant
+
+To connect this server to an AI assistant like Claude Desktop for local development:
+
+1.  Navigate to your AI assistant's developer/tool settings.
+2.  Add a new local MCP server with the following configuration:
+    ```json
+    "twitter-mcp-server": {
+      "command": "docker",
+      "args": [
+        "exec",
+        "-i",
+        "twitter-mcp-server",
+        "node",
+        "dist/index.js"
+      ]
+    }
     ```
